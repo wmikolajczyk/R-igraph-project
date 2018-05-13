@@ -10,15 +10,15 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## R Markdown
-```{r}
+```{r download dataset}
 library(RCurl)
 
 datasetUrl = "http://www.sociopatterns.org/wp-content/uploads/2016/06/tij_InVS.dat_.zip"
 datasetMetaUrl = "http://www.sociopatterns.org/wp-content/uploads/2016/06/metadata_InVS13.txt"
-
 datasetFilename = "workplace.zip"
-datasetMetaFilename = "workplace_meta.txt"
+datasetMetaFilename = "workplace_meta.csv"
 
+# dataset file (timestamp node1_id node2_id)
 datasetBin = getBinaryURL(datasetUrl)
 destFile = file(datasetFilename, open="wb")
 writeBin(datasetBin, destFile)
@@ -30,12 +30,21 @@ if (file.exists(datasetFilename))
 }
 file.rename("tij_InVS.dat", "workplace_dataset.csv")
 
+# metadata file (node_id node_attribute)
 datasetMeta = getURL(datasetMetaUrl)
 destMetaFile = file(datasetMetaFilename, open="w")
 write(datasetMeta, destMetaFile)
 close(destMetaFile)
-
 ```
 
+```{r}
+library(igraph)
+
+nodes <- read.csv(datasetMetaFilename, sep="\t", header=FALSE)
+links <- read.csv("workplace_dataset.csv", sep=" ", header=FALSE, colClasses = c("NULL", NA, NA))
+
+net <- graph_from_edgelist(as.matrix(links))
+net <- set_vertex_attr(net, "department", index=nodes$V1, as.character(nodes$V2))
+```
 
 
