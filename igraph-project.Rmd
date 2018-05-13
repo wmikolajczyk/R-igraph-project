@@ -1,0 +1,41 @@
+---
+title: "igraph-project"
+author: "Wojciech Mikołajczyk"
+date: "May 13, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+```{r}
+library(RCurl)
+
+datasetUrl = "http://www.sociopatterns.org/wp-content/uploads/2016/06/tij_InVS.dat_.zip"
+datasetMetaUrl = "http://www.sociopatterns.org/wp-content/uploads/2016/06/metadata_InVS13.txt"
+
+datasetFilename = "workplace.zip"
+datasetMetaFilename = "workplace_meta.txt"
+
+datasetBin = getBinaryURL(datasetUrl)
+destFile = file(datasetFilename, open="wb")
+writeBin(datasetBin, destFile)
+close(destFile)
+unzip(datasetFilename)
+if (file.exists(datasetFilename))
+{
+    file.remove(datasetFilename)
+}
+file.rename("tij_InVS.dat", "workplace_dataset.csv")
+
+datasetMeta = getURL(datasetMetaUrl)
+destMetaFile = file(datasetMetaFilename, open="w")
+write(datasetMeta, destMetaFile)
+close(destMetaFile)
+
+```
+
+
+
