@@ -48,7 +48,10 @@ net <- set_vertex_attr(net, "department", index=nodes$V1, as.character(nodes$V2)
 # set initial weight of all edges to 1
 E(net)$weight <- 1
 # adjust weights
-net2 <- simplify(net, edge.attr.comb=list(weight="sum"))
+net <- simplify(net, edge.attr.comb=list(weight="sum"))
+# make graph undirected (meeting of 2 people is like undirected relation)
+net <- as.undirected(net, mode="collapse", edge.attr.comb="sum")
+
 ```
 
 
