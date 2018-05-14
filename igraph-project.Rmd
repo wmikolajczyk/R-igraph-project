@@ -51,7 +51,20 @@ E(net)$weight <- 1
 net <- simplify(net, edge.attr.comb=list(weight="sum"))
 # make graph undirected (meeting of 2 people is like undirected relation)
 net <- as.undirected(net, mode="collapse", edge.attr.comb="sum")
+# delete unconnected verticles
+net <-delete.vertices(net, degree(net)==0)
 
+library(RColorBrewer)
+numberOrDepartments = length(unique(V(net)$department))
+myColors <- brewer.pal(numberOrDepartments,"Set1")
+
+plot.igraph(
+  net,
+  # weight based on edge
+  edge.width=E(net)$weight/10,
+  # colors
+  vertex.color = myColors[as.numeric(as.factor(V(net)$department))]
+)
 ```
 
 
