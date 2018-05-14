@@ -37,7 +37,7 @@ write(datasetMeta, destMetaFile)
 close(destMetaFile)
 ```
 
-```{r}
+```{r load graph}
 library(igraph)
 
 nodes <- read.csv(datasetMetaFilename, sep="\t", header=FALSE)
@@ -53,7 +53,9 @@ net <- simplify(net, edge.attr.comb=list(weight="sum"))
 net <- as.undirected(net, mode="collapse", edge.attr.comb="sum")
 # delete unconnected verticles
 net <-delete.vertices(net, degree(net)==0)
+```
 
+```{r plot1}
 library(RColorBrewer)
 numberOrDepartments = length(unique(V(net)$department))
 myColors <- brewer.pal(numberOrDepartments,"Set1")
@@ -67,4 +69,13 @@ plot.igraph(
 )
 ```
 
+```{r plot2}
+plot.igraph(
+  net,
+  # edge thickness depending on edge betweenness
+  edge.width=edge_betweenness(net, directed=FALSE, weights = E(net)$weight)/50,
+  # vertex size based on betweenness
+  vertex.size=betweenness(net, directed=FALSE, weights=E(net)$weight)/10
+)
+```
 
