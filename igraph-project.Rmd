@@ -55,7 +55,7 @@ net <- as.undirected(net, mode="collapse", edge.attr.comb="sum")
 net <-delete.vertices(net, degree(net)==0)
 ```
 
-```{r plot1}
+```{r plot1 - verticle color based on attribute value, edge thickness depends on edge weight}
 library(RColorBrewer)
 numberOrDepartments = length(unique(V(net)$department))
 myColors <- brewer.pal(numberOrDepartments,"Set1")
@@ -70,7 +70,7 @@ plot(
 )
 ```
 
-```{r plot2}
+```{r plot2 - verticle size depends of verticle betweenness, edge thickness depends on edge betweenness}
 plot(
   net,
   # edge thickness depending on edge betweenness
@@ -80,7 +80,7 @@ plot(
 )
 ```
 
-```{r plot3}
+```{r plot3 - show longest shortest path}
 # shortest paths
 shortestPaths = distances(net)
 longestShortestPath = which(shortestPaths==max(shortestPaths), arr.ind = TRUE)[1,]
@@ -109,5 +109,30 @@ plot(
   # verticles - color and size
   vertex.color=vcol,
   vertex.size=vsize
+)
+```
+
+```{r plot4 - largest clique}
+largest_clique <- largest_cliques(net)[1]
+# color
+vcol <- rep("grey80", vcount(net))
+vcol[unlist(largest_clique)] <- "gold"
+# size
+vsize <- rep(7, vcount(net))
+vsize[unlist(largest_clique)] <- 10
+
+clique_edges = get.edge.ids(net, unlist(largest_clique))
+ecol <- rep("gray80", ecount(net))
+ecol[clique_edges] <- "gold"
+
+ew <- rep(0.5, ecount(net))
+ew[clique_edges] <- 5
+
+plot(
+  net,
+  vertex.color=vcol,
+  vertex.size=vsize,
+  edge.color=ecol,
+  edge.width=ew
 )
 ```
