@@ -60,17 +60,18 @@ library(RColorBrewer)
 numberOrDepartments = length(unique(V(net)$department))
 myColors <- brewer.pal(numberOrDepartments,"Set1")
 
-plot.igraph(
+plot(
   net,
   # weight based on edge
   edge.width=E(net)$weight/10,
   # colors
-  vertex.color = myColors[as.numeric(as.factor(V(net)$department))]
+  vertex.color = myColors[as.numeric(as.factor(V(net)$department))],
+  vertex.size=10
 )
 ```
 
 ```{r plot2}
-plot.igraph(
+plot(
   net,
   # edge thickness depending on edge betweenness
   edge.width=edge_betweenness(net, directed=FALSE, weights = E(net)$weight)/50,
@@ -79,3 +80,34 @@ plot.igraph(
 )
 ```
 
+```{r plot3}
+# shortest paths
+shortestPaths = distances(net)
+longestShortestPath = which(a==max(a), arr.ind = TRUE)[1,]
+node1 = longestShortestPath[1]
+node2 = longestShortestPath[2]
+
+net.path = shortest_paths(net, from=node1, to=node2, output="both")
+# edges colors
+ecol <- rep("gray80", ecount(net))
+ecol[unlist(net.path$epath)] <- "orange"
+# edges width
+ew <- rep(0.5, ecount(net))
+ew[unlist(net.path$epath)] <- 5
+# verticles color
+vcol <- rep("gray40", vcount(net))
+vcol[unlist(net.path$vpath)] <- "gold"
+# verticles size
+vsize <-rep(7, vcount(net))
+vsize[unlist(net.path$vpath)] <- 14
+
+plot(
+  net,
+  # edges - color and width
+  edge.color=ecol,
+  edge.width=ew,
+  # verticles - color and size
+  vertex.color=vcol,
+  vertex.size=vsize
+)
+```
