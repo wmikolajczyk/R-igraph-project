@@ -57,7 +57,7 @@ net <-delete.vertices(net, degree(net)==0)
 
 ```{r plot1 - verticle color based on attribute value, edge thickness depends on edge weight}
 library(RColorBrewer)
-numberOrDepartments = length(unique(V(net)$department))
+numberOrDepartments <- length(unique(V(net)$department))
 myColors <- brewer.pal(numberOrDepartments,"Set1")
 
 plot(
@@ -82,10 +82,10 @@ plot(
 
 ```{r plot3 - show longest shortest path}
 # shortest paths
-shortestPaths = distances(net)
-longestShortestPath = which(shortestPaths==max(shortestPaths), arr.ind = TRUE)[1,]
-node1 = longestShortestPath[1]
-node2 = longestShortestPath[2]
+shortestPaths <- distances(net)
+longestShortestPath <- which(shortestPaths==max(shortestPaths), arr.ind = TRUE)[1,]
+node1 <- longestShortestPath[1]
+node2 <- longestShortestPath[2]
 
 net.path = shortest_paths(net, from=node1, to=node2, output="both")
 # edges colors
@@ -135,4 +135,15 @@ plot(
   edge.color=ecol,
   edge.width=ew
 )
+```
+
+```{r plot5 - vertex degree distribution}
+distribution <- degree_distribution(net, cumulative=TRUE)
+plot(distribution)
+# TODO: ggplot
+```
+
+```{r plot6 - distance from one vertex to the others}
+dist <- distances(net, v=1, to=V(net))
+plot(as.numeric(dist))
 ```
