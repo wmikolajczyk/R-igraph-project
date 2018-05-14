@@ -83,7 +83,7 @@ plot(
 ```{r plot3}
 # shortest paths
 shortestPaths = distances(net)
-longestShortestPath = which(a==max(a), arr.ind = TRUE)[1,]
+longestShortestPath = which(shortestPaths==max(shortestPaths), arr.ind = TRUE)[1,]
 node1 = longestShortestPath[1]
 node2 = longestShortestPath[2]
 
