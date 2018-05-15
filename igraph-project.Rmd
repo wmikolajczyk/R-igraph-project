@@ -2,33 +2,35 @@
 title: "igraph-project"
 author: "Wojciech Mikołajczyk"
 date: "May 13, 2018"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+# Projekt R/igraph
+## 1. Pobranie i wypakowanie datasetu
 ```{r download dataset}
 library(RCurl)
 
 datasetUrl = "http://www.sociopatterns.org/wp-content/uploads/2016/06/tij_InVS.dat_.zip"
 datasetMetaUrl = "http://www.sociopatterns.org/wp-content/uploads/2016/06/metadata_InVS13.txt"
-datasetFilename = "workplace.zip"
+datasetZipFilename = "workplace.zip"
+datasetFilename = "workplace_dataset.csv"
 datasetMetaFilename = "workplace_meta.csv"
 
 # dataset file (timestamp node1_id node2_id)
 datasetBin = getBinaryURL(datasetUrl)
-destFile = file(datasetFilename, open="wb")
+destFile = file(datasetZipFilename, open="wb")
 writeBin(datasetBin, destFile)
 close(destFile)
-unzip(datasetFilename)
-if (file.exists(datasetFilename))
+unzip(datasetZipFilename)
+if (file.exists(datasetZipFilename))
 {
-    file.remove(datasetFilename)
+    file.remove(datasetZipFilename)
 }
-file.rename("tij_InVS.dat", "workplace_dataset.csv")
+file.rename("tij_InVS.dat", datasetFilename)
 
 # metadata file (node_id node_attribute)
 datasetMeta = getURL(datasetMetaUrl)
@@ -36,12 +38,12 @@ destMetaFile = file(datasetMetaFilename, open="w")
 write(datasetMeta, destMetaFile)
 close(destMetaFile)
 ```
-
+## 2. Wczytanie grafu z datasetu
 ```{r load graph}
 library(igraph)
 
 nodes <- read.csv(datasetMetaFilename, sep="\t", header=FALSE)
-links <- read.csv("workplace_dataset.csv", sep=" ", header=FALSE, colClasses = c("NULL", NA, NA))
+links <- read.csv(datasetFilename, sep=" ", header=FALSE, colClasses = c("NULL", NA, NA))
 
 net <- graph_from_edgelist(as.matrix(links))
 net <- set_vertex_attr(net, "department", index=nodes$V1, as.character(nodes$V2))
@@ -54,7 +56,8 @@ net <- as.undirected(net, mode="collapse", edge.attr.comb="sum")
 # delete unconnected verticles
 net <-delete.vertices(net, degree(net)==0)
 ```
-
+## 3. Wykresy
+### Wykres 1 - kolor wierzchołka zależny od atrybutu, grubość krawędzi zależna od wagi
 ```{r plot1 - verticle color based on attribute value, edge thickness depends on edge weight}
 library(RColorBrewer)
 numberOrDepartments <- length(unique(V(net)$department))
@@ -70,6 +73,7 @@ plot(
 )
 ```
 
+### Wykres 2 - wielkość wierzchołka i grubość krawędzi zależna od pośrednictwa
 ```{r plot2 - verticle size depends of verticle betweenness, edge thickness depends on edge betweenness}
 plot(
   net,
@@ -80,6 +84,7 @@ plot(
 )
 ```
 
+### Wykres 3 - najdłuższa z najkrótszych ścieżek
 ```{r plot3 - show longest shortest path}
 # shortest paths
 shortestPaths <- distances(net)
@@ -112,6 +117,7 @@ plot(
 )
 ```
 
+### Wykres 4 - największa klika
 ```{r plot4 - largest clique}
 largest_clique <- largest_cliques(net)[1]
 # color
@@ -137,12 +143,11 @@ plot(
 )
 ```
 
+### Wykres 5 - rozkład stopni wierzchołków
 ```{r plot5 - vertex degree distribution}
-distribution <- degree_distribution(net, cumulative=TRUE)
-plot(distribution)
-# TODO: ggplot
+plot(table(degree(net)))
 ```
-
+### Wykres 6 - odległość z wierzchołka id=1 do pozostałych
 ```{r plot6 - distance from one vertex to the others}
 dist <- distances(net, v=1, to=V(net))
 plot(as.numeric(dist))
