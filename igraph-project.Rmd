@@ -145,10 +145,20 @@ plot(
 
 ### Wykres 5 - rozkład stopni wierzchołków
 ```{r plot5 - vertex degree distribution}
-plot(table(degree(net)))
+library(ggplot2)
+degreeDistribution <- table(degree(net))
+ggplot(as.data.frame(degreeDistribution), aes(x=Var1, y=Freq)) + 
+  geom_bar(stat="identity") + 
+  labs(title="Rozklad stopni wierzcholkow", x="Stopien wierzcholka", y="Liczba wierzcholkow") + 
+  theme_bw()
 ```
 ### Wykres 6 - odległość z wierzchołka id=1 do pozostałych
 ```{r plot6 - distance from one vertex to the others}
 dist <- distances(net, v=1, to=V(net))
-plot(as.numeric(dist))
+
+oranges <- colorRampPalette(c("gold", "dark red"))
+col <- oranges(max(dist)+1)
+col <- col[dist+1]
+
+plot(net, vertex.color=col, vertex.label=dist, vertex.label.color="white")
 ```
